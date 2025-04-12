@@ -43,12 +43,15 @@ void run_myinfo() {
 
 			if (strcmp(cmd, "withdraw") == 0) {
 				run_withdraw();
+				break;
 			}
 			else if (strcmp(cmd, "change") == 0) {
 				run_change();
+				break;
 			}
 			else if(strcmp(cmd, "manage") == 0) {
 				run_manage();
+				break;
 			}
 		}
 	}
