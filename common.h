@@ -11,42 +11,42 @@
 
 #define MAX_DATE 11
 
-// ÆÄÀÏ °æ·Î
-#define USER_FILE "users_data.txt"             // »ç¿ëÀÚ Á¤º¸ ÆÄÀÏ
-#define BOOK_FILE "books_data.txt"             // µµ¼­ Á¤º¸ ÆÄÀÏ
-#define LEND_RETURN_FILE "lend_return_data.txt" // ´ë¿© Á¤º¸ ÆÄÀÏ
+// íŒŒì¼ ê²½ë¡œ
+#define USER_FILE "users_data.txt"             // ì‚¬ìš©ì ì •ë³´ íŒŒì¼
+#define BOOK_FILE "books_data.txt"             // ë„ì„œ ì •ë³´ íŒŒì¼
+#define LEND_RETURN_FILE "lend_return_data.txt" // ëŒ€ì—¬ ì •ë³´ íŒŒì¼
 
-// »ç¿ëÀÚ ±¸Á¶Ã¼
+// ì‚¬ìš©ì êµ¬ì¡°ì²´
 typedef struct {
-    char name[MAX_NAME];                      // ÀÌ¸§
-    char studentId[MAX_ID];                  // ÇĞ¹ø
-    char password[MAX_PW];                   // ºñ¹Ğ¹øÈ£
-    char lentBids[5][MAX_BID];               // ´ë¿©ÇÑ Ã¥ BID ÃÖ´ë 5±Ç (';' ¾øÀÌ ¹è¿­·Î Ã³¸®)
-    int lendAvailable;                       // ´ë¿© °¡´É ±Ç¼ö
+    char name[MAX_NAME];                      // ì´ë¦„
+    char studentId[MAX_ID];                  // í•™ë²ˆ
+    char password[MAX_PW];                   // ë¹„ë°€ë²ˆí˜¸
+    char lentBids[5][MAX_BID];               // ëŒ€ì—¬í•œ ì±… BID ìµœëŒ€ 5ê¶Œ (';' ì—†ì´ ë°°ì—´ë¡œ ì²˜ë¦¬)
+    int lendAvailable;                       // ëŒ€ì—¬ ê°€ëŠ¥ ê¶Œìˆ˜
 } User;
 
-// µµ¼­ ±¸Á¶Ã¼
+// ë„ì„œ êµ¬ì¡°ì²´
 typedef struct {
-    char title[MAX_TITLE];                   // Á¦¸ñ
-    char author[MAX_AUTHOR];                 // ÀúÀÚ
-    char bid[MAX_BID];                       // µµ¼­ °íÀ¯ BID
-    int isAvailable;                         // ´ë¿© °¡´É ¿©ºÎ (0: °¡´É, 1: ´ë¿© Áß)
+    char title[MAX_TITLE];                   // ì œëª©
+    char author[MAX_AUTHOR];                 // ì €ì
+    char bid[MAX_BID];                       // ë„ì„œ ê³ ìœ  BID
+    int isAvailable;                         // ëŒ€ì—¬ ê°€ëŠ¥ ì—¬ë¶€ (0: ê°€ëŠ¥, 1: ëŒ€ì—¬ ì¤‘)
 } Book;
 
-// ´ëÃâ/¹İ³³ ±¸Á¶Ã¼
+// ëŒ€ì¶œ/ë°˜ë‚© êµ¬ì¡°ì²´
 typedef struct {
-    char userid[MAX_ID];                     // »ç¿ëÀÚ ÇĞ¹ø
-    char bookBid[MAX_BID];                   // µµ¼­ BID
-    char borrowDate[MAX_DATE];              // ´ëÃâÀÏ (yyyy-mm-dd)
-    char returnDate[MAX_DATE];              // ¹İ³³ÀÏ (yyyy-mm-dd)
-    int isOverdue;                           // ¿¬Ã¼ ¿©ºÎ (0: Á¤»ó, 1: ¿¬Ã¼)
+    char userid[MAX_ID];                     // ì‚¬ìš©ì í•™ë²ˆ
+    char bookBid[MAX_BID];                   // ë„ì„œ BID
+    char borrowDate[MAX_DATE];              // ëŒ€ì¶œì¼ (yyyy-mm-dd)
+    char returnDate[MAX_DATE];              // ë°˜ë‚©ì¼ (yyyy-mm-dd)
+    int isOverdue;                           // ì—°ì²´ ì—¬ë¶€ (0: ì •ìƒ, 1: ì—°ì²´)
 } Lend_Return;
 
-// ·Î±×ÀÎ ¿©ºÎ¿Í »ç¿ëÀÚ ID
+// ë¡œê·¸ì¸ ì—¬ë¶€ì™€ ì‚¬ìš©ì ID
 extern int is_logged_in;
-extern char current_user_id[MAX_ID];
+extern User current_user;
 
-// run ÇÔ¼ö ¼±¾ğ
+// run í•¨ìˆ˜ ì„ ì–¸
 void run_help(const char* argument);
 void run_verify();
 void run_account();
@@ -57,9 +57,9 @@ void run_borrow();
 void run_return();
 void run_myinfo();
 
-// °øÅëÀûÀ¸·Î ¾²ÀÌ´Â ÇÔ¼öµé
-void print_command_usage();                     // Ç¥ Ãâ·Â ÇÔ¼ö
-char* get_canonical_command(const char* input); // µ¿ÀÇ¾î ¡æ ´ëÇ¥¸í·É¾î
+// ê³µí†µì ìœ¼ë¡œ ì“°ì´ëŠ” í•¨ìˆ˜ë“¤
+void print_command_usage();                     // í‘œ ì¶œë ¥ í•¨ìˆ˜
+char* get_canonical_command(const char* input); // ë™ì˜ì–´ â†’ ëŒ€í‘œëª…ë ¹ì–´
 void trim(char* str);
 
 #endif
