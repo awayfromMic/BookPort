@@ -57,12 +57,12 @@ void run_record() {
 	for (int i = 0; i < lend_return_count; i++) {
 		if (strcmp(current_user.studentId, Lend_Return[i].userid) == 0) {	//current_user 구조체 필요
 			strcpy(user_record[user_record_count].date, Lend_Return[i].borrowDate);
-			strcpy(user_record[user_record_count].type, "[borrow]");
+			strcpy(user_record[user_record_count].type, "borrow");
 			strcpy(user_record[user_record_count].bid, Lend_Return[i].bookBid);
 			user_record_count++;
 			if (Lend_Return[i].returnDate[0] != '\0') {
 				strcpy(user_record[user_record_count].date, Lend_Return[i].returnDate);
-				strcpy(user_record[user_record_count].type, "[return]");
+				strcpy(user_record[user_record_count].type, "return");
 				strcpy(user_record[user_record_count].bid, Lend_Return[i].bookBid);
 				user_record_count++;
 			}
@@ -72,7 +72,7 @@ void run_record() {
 	qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
 	for (int i = 0; i < user_record_count; i++) {
 		char* d = user_record[i].date;
-		printf("%s %s %c%c/%c%c/%c%c\n",
+		printf("[%s] %s %c%c/%c%c/%c%c\n",
 			user_record[i].type,
 			user_record[i].bid,
 			d[2], d[3], d[4], d[5], d[6], d[7]);
