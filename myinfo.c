@@ -54,7 +54,7 @@ void run_record() {
 	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry)); //각 파일 linecount, load필요
 	int user_record_count = 0;
 	for (int i = 0; i < lend_return_count; i++) {
-		if (strcmp(current_user.studentId, Lend_Return[i].userid) == 0) {	//current_user 구조체 필요
+		if (strcmp(current_user.studentId, Lend_Return[i].userid) == 0) {	
 			strcpy(user_record[user_record_count].date, Lend_Return[i].borrowDate);
 			strcpy(user_record[user_record_count].type, "borrow");
 			strcpy(user_record[user_record_count].bid, Lend_Return[i].bookBid);
