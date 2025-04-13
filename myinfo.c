@@ -67,8 +67,8 @@ void run_record() {
 			}
 		}
 	}
-	user_record = (RecordEntry*)realloc(user_record, user_record_count * sizeof(RecordEntry));
 	qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
+	if(user_record_count>0) printf("=> ");
 	for (int i = 0; i < user_record_count; i++) {
 		char* d = user_record[i].date;
 		printf("[%s] %s %c%c/%c%c/%c%c\n",
@@ -119,7 +119,7 @@ void run_myinfo() {
 	if (is_logged_in == 1) {
 		printf("[My Information]\n");
 		printf("Name: %s\n", current_user.name);
-		printf("ID: %s\n", current_user.studentID);
+		printf("ID: %s\n", current_user.studentId);
 
 		char input[100];
 
