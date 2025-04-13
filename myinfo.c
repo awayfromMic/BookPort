@@ -52,7 +52,7 @@ int compare_record_entry(const void* a, const void* b) {
 }
 
 void run_record() {
-	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry)); //각 파일 lincount필요(lend_return_count, bookcount)
+	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry)); //각 파일 linecount, load필요
 	int user_record_count = 0;
 	for (int i = 0; i < lend_return_count; i++) {
 		if (strcmp(current_user.studentId, Lend_Return[i].userid) == 0) {	//current_user 구조체 필요
