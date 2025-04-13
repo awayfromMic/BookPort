@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "common.h"
-#include "login.h"
 
 char* get_myinfo_canonical_command(char* input) {
 	struct {
