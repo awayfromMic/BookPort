@@ -94,7 +94,7 @@ void run_borrow() {
 
 int updata_file(Lend_Return lend) {
     //파일 수정
-    FILE* file_user = fopen("USER_FILE", "a");
+    FILE* file_user = fopen("USER_FILE", "r");
     FILE* file_temp = fopen("TEMP_FILE", "w");
     if (!file_user || !file_temp) {
         printf("Cannot open file.\n");
@@ -143,7 +143,7 @@ int updata_file(Lend_Return lend) {
     fclose(file_temp);
     remove(BOOK_FILE);
     rename(TEMP_FILE, BOOK_FILE);
-    FILE* file_lend = fopen("LEND_RETURN_FILE", "");
+    FILE* file_lend = fopen("LEND_RETURN_FILE", "a");
     if (!file_user) {
         printf("Cannot open file.\n");
         return 0;
