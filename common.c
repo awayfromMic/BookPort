@@ -1,5 +1,5 @@
 #include "common.h"
 
-// ·Î±×ÀÎ ¿©ºÎ ÆÇ´Ü
-int is_logged_in = 0; // ·Î±×ÀÎ ½Ã 1
-char current_user_id[MAX_ID] = "";
+// ë¡œê·¸ì¸ ì—¬ë¶€ íŒë‹¨
+int is_logged_in = 0; // ë¡œê·¸ì¸ ì‹œ 1
+User current_user;
