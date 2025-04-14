@@ -24,11 +24,11 @@ void run_borrow() {
         fgets(bid_input, sizeof(bid_input), stdin);
         trim(bid_input);
 
-        // BID À¯È¿¼º °Ë»ç
+        // BID ìœ íš¨ì„± ê²€ì‚¬
         if (!is_valid_bid(bid_input)) {
             continue;
         }
-        // °Ë»öµÈ Ã¥ Áß BID ÀÏÄ¡ ¿©ºÎ È®ÀÎ
+        // ê²€ìƒ‰ëœ ì±… ì¤‘ BID ì¼ì¹˜ ì—¬ë¶€ í™•ì¸
         FILE* file = fopen(BOOK_FILE, "r");
         if (!file) {
             printf("Cannot open file.\n");
@@ -48,7 +48,7 @@ void run_borrow() {
                 found++;
                 strcpy(lend.bookBid, book.bid);
                 if (status_char == 'Y') {
-                    printf("Error: ÀÌ¹Ì ´ëÃâµÈ Ã¥\n");
+                    printf("Error: ì´ë¯¸ ëŒ€ì¶œëœ ì±…\n");
                     found++;
                 }
                 break;
@@ -56,7 +56,7 @@ void run_borrow() {
         }
         fclose(file);
         if (found == 0) {
-            printf("Error: ÇØ´çÇÏ´Â Ã¥ ¾øÀ½");
+            printf("Error: í•´ë‹¹í•˜ëŠ” ì±… ì—†ìŒ");
             continue;
         }
         else if (found == 2) {
@@ -93,7 +93,7 @@ void run_borrow() {
 }
 
 int updata_file(Lend_Return lend) {
-    //ÆÄÀÏ ¼öÁ¤
+    //íŒŒì¼ ìˆ˜ì •
     FILE* file_user = fopen("USER_FILE", "r");
     FILE* file_temp = fopen("TEMP_FILE", "w");
     if (!file_user || !file_temp) {
@@ -106,13 +106,13 @@ int updata_file(Lend_Return lend) {
     while (fscanf(file_user, "%99[^,],%19[^,],%19[^,],%101[^,],%d\n",
         name, studentId, password, bids, &available) == 5) {
         if (strcmp(studentId, current_user.studentId) == 0) {
-            // ÀÌ »ç¿ëÀÚ°¡ ´ë»óÀÌ¸é ¼öÁ¤µÈ Á¤º¸·Î ±â·Ï
+            // ì´ ì‚¬ìš©ìê°€ ëŒ€ìƒì´ë©´ ìˆ˜ì •ëœ ì •ë³´ë¡œ ê¸°ë¡
             strcat(bids, ";");
             strcat(bids,lend.bookBid);
             fprintf(file_temp, "%s,%s,%s,%s,%d\n", name, studentId, password, bids, available - 1);
         }
         else {
-            // ±× ¿Ü »ç¿ëÀÚ´Â ±×´ë·Î º¹»ç
+            // ê·¸ ì™¸ ì‚¬ìš©ìëŠ” ê·¸ëŒ€ë¡œ ë³µì‚¬
             fprintf(file_temp, "%s,%s,%s,%s,%d\n", name, studentId, password, bids, available);
         }
     }
@@ -131,11 +131,11 @@ int updata_file(Lend_Return lend) {
     while (fscanf(file_books, "%49[^,],%[^,],%29[^,],%104[^,],%c\n",
         title, author, bid, &isAvailable) == 4) {
         if (strcmp(bid, lend.bookBid) == 0) {
-            // ÀÌ »ç¿ëÀÚ°¡ ´ë»óÀÌ¸é ¼öÁ¤µÈ Á¤º¸·Î ±â·Ï
+            // ì´ ì‚¬ìš©ìê°€ ëŒ€ìƒì´ë©´ ìˆ˜ì •ëœ ì •ë³´ë¡œ ê¸°ë¡
             fprintf(file_temp, "%s,%s,%s,%c\n", title, author, bid, "N");
         }
         else {
-            // ±× ¿Ü »ç¿ëÀÚ´Â ±×´ë·Î º¹»ç
+            // ê·¸ ì™¸ ì‚¬ìš©ìëŠ” ê·¸ëŒ€ë¡œ ë³µì‚¬
             fprintf(file_temp, "%s,%s,%s,%s,%c\n", title, author, bid, isAvailable);
         }
     }
@@ -163,31 +163,31 @@ int is_valid_bid(const char* bid) {
     for (int i = 0; i < len; ++i) {
         char c = bid[i];
 
-        // Çã¿ë ¹®ÀÚ °Ë»ç
+        // í—ˆìš© ë¬¸ì ê²€ì‚¬
         if (isalnum(c) || c == '-' || c == '.' || c == ':') {
             continue;
         }
 
-        // °ø¹é ¹®ÀÚ Áß ½ºÆäÀÌ½º°¡ ¾Æ´Ñ °Í °Ë»ç
+        // ê³µë°± ë¬¸ì ì¤‘ ìŠ¤í˜ì´ìŠ¤ê°€ ì•„ë‹Œ ê²ƒ ê²€ì‚¬
         if (isspace(c) && c != ' ') {
             printf(".!! Error: BID cannot contain tab/newline characters.\n");
             return 0;
         }
 
-        // Çã¿ëµÇÁö ¾ÊÀº Æ¯¼ö¹®ÀÚ
+        // í—ˆìš©ë˜ì§€ ì•Šì€ íŠ¹ìˆ˜ë¬¸ì
         if (!isalnum(c) && c != '-' && c != '.' && c != ':' && c != ' ') {
             printf(".!! Error: BID contains invalid character: '%c'\n", c);
             return 0;
         }
     }
-    return 1; // ¸ğµç Á¶°Ç Åë°ú
+    return 1; // ëª¨ë“  ì¡°ê±´ í†µê³¼
 }
 
 int is_valid_date(const char* input) {
     char date[9] = "";  // yyyyMMdd
     int di = 0;
 
-    // ±¸ºĞÀÚ Á¦°ÅÇÏ¸é¼­ ¼ıÀÚ¸¸ ÃßÃâ
+    // êµ¬ë¶„ì ì œê±°í•˜ë©´ì„œ ìˆ«ìë§Œ ì¶”ì¶œ
     for (int i = 0; input[i] != '\0' && di < 8; i++) {
         if (isdigit(input[i])) {
             date[di++] = input[i];
@@ -202,13 +202,13 @@ int is_valid_date(const char* input) {
         return 0;
     }
 
-    // ¿¬µµ, ¿ù, ÀÏ ÃßÃâ
+    // ì—°ë„, ì›”, ì¼ ì¶”ì¶œ
     int year = (date[0] - '0') * 1000 + (date[1] - '0') * 100 +
         (date[2] - '0') * 10 + (date[3] - '0');
     int month = (date[4] - '0') * 10 + (date[5] - '0');
     int day = (date[6] - '0') * 10 + (date[7] - '0');
 
-    // À¯È¿ÇÑ ³¯Â¥ ¹üÀ§ÀÎÁö È®ÀÎ
+    // ìœ íš¨í•œ ë‚ ì§œ ë²”ìœ„ì¸ì§€ í™•ì¸
     if (month < 1 || month > 12) {
         printf(".!! Error: Invalid month in date.\n");
         return 0;
@@ -216,12 +216,12 @@ int is_valid_date(const char* input) {
 
     int max_days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
     if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
-        max_days[1] = 29;  // À±³â
+        max_days[1] = 29;  // ìœ¤ë…„
     }
 
     if (day < 1 || day > max_days[month - 1]) {
         printf(".!! Error: Invalid day in date.\n");
         return 0;
     }
-    return 1; // ¸ğµÎ Åë°ú
+    return 1; // ëª¨ë‘ í†µê³¼
 }
