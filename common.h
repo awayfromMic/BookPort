@@ -62,6 +62,8 @@ void print_list(linked_list* list, int type);
 bool check_equality(void* data1, void* data2, int type);
 Book* find_by_author(linked_list* list, const char* author);
 Book* find_by_title(linked_list* list, const char* title);
+bool check_empty(char* token, bool* file_integrity);
+void add_violation_line(linked_list* list, char* line);
 
 // ����/�ݳ� ����ü
 typedef struct {
