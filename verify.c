@@ -9,7 +9,7 @@
 // 사용자 정보 관련 함수
 int is_valid_student_name(const char* name) {
     int len = strlen(name);
-    if (!name || len < 1 || len > 100)   return 0;
+    if (!name || len < 1 || len > 100)  return 0;
     for (int i = 0; i < len; i++) {
         if (!isalpha(name[i]) && name[i] != ' ')
             return 0;
@@ -228,135 +228,99 @@ int is_meaningful_overdue(const char* overdue) {
 
 
 void run_verify() {
-    const char* files[] = { USER_FILE, BOOK_FILE, LEND_RETURN_FILE };
-    const char* file_names[] = { "User", "Book", "Lend/Return" };
+    linked_list* user_list = read_user_data();
+    linked_list* book_list = read_book_data();
+    linked_list* borrow_list = read_borrow_data();
+
     int error_count = 0;
-
-    char student_ids[MAX_USERS][MAX_ID];
+    char student_ids[MAX_USERS][MAX_ID] = { 0 };
     int student_id_count = 0;
-
-    char bids[MAX_BOOKS][MAX_BID];
+    char bids[MAX_BOOKS][MAX_BID] = { 0 };
     int bid_count = 0;
 
-    for (int i = 0; i < 3; i++) {
-        FILE* f = fopen(files[i], "r");
-        if (!f) {
-            f = fopen(files[i], "w");
-            if (!f) {
-                printf("Error: Cannot create file %s\n", files[i]);
-                exit(1);
-            }
-            printf("[INFO] Empty file created: %s\n", files[i]);
-            fclose(f);
-            continue;
+    if (user_list->head == NULL) {
+        printf("[INFO] Empty file: User\n");
+    }
+
+    // 1. 사용자 파일 검증
+    printf(">>> Verifying User file...\n");
+    node* current = user_list->head;
+    while (current) {
+        User* u = (User*)current->data;
+
+        if (!is_valid_student_name(u->name)) {
+            printf("Invalid name: %s\n", u->name); error_count++;
         }
-
-        printf(">>> Verifying %s file...\n", file_names[i]);
-
-        char line[MAX_LINE];
-        int line_num = 0;
-
-        while (fgets(line, sizeof(line), f)) {
-            line_num++;
-            trim(line);
-
-            if (i == 0) { // USER_FILE
-                User u;
-                char* token = strtok(line, ",");
-                if (!token || !is_valid_student_name(token)) {
-                    printf("Invalid name in line %d\n", line_num); error_count++; continue;
-                }
-                strncpy(u.name, token, MAX_NAME);
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_student_id(token)) {
-                    printf("Invalid studentId in line %d\n", line_num); error_count++; continue;
-                }
-                strncpy(u.studentId, token, MAX_ID);
-
-                // 중복 학번 검사
-                for (int j = 0; j < student_id_count; j++) {
-                    if (strcmp(student_ids[j], u.studentId) == 0) {
-                        printf("Duplicate studentId in line %d: %s\n", line_num, u.studentId);
-                        error_count++;
-                        break;
-                    }
-                }
-                strncpy(student_ids[student_id_count++], u.studentId, MAX_ID);
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_password(token)) {
-                    printf("Invalid password in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                int lendAv = token ? atoi(token) : -1;
-                if (!is_valid_lendavailable(&lendAv)) {
-                    printf("Invalid lendAvailable in line %d\n", line_num); error_count++; continue;
-                }
-            }
-            else if (i == 1) { // BOOK_FILE
-                Book b;
-                char* token = strtok(line, ",");
-                if (!token || !is_valid_book_title(token)) {
-                    printf("Invalid title in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_book_author(token)) {
-                    printf("Invalid author in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_bid(token)) {
-                    printf("Invalid BID in line %d\n", line_num); error_count++; continue;
-                }
-                strncpy(b.bid, token, MAX_BID);
-
-                // 중복 BID 검사
-                for (int j = 0; j < bid_count; j++) {
-                    if (strcmp(bids[j], b.bid) == 0) {
-                        printf("Duplicate BID in line %d: %s\n", line_num, b.bid);
-                        error_count++;
-                        break;
-                    }
-                }
-                strncpy(bids[bid_count++], b.bid, MAX_BID);
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_flag(token)) {
-                    printf("Invalid flag in line %d\n", line_num); error_count++; continue;
-                }
-            }
-            else if (i == 2) { // LEND_RETURN_FILE
-                Lend_Return lr;
-                char* token = strtok(line, ",");
-                if (!token || !is_valid_student_id(token)) {
-                    printf("Invalid studentId in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_bid(token)) {
-                    printf("Invalid BID in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_date(token)) {
-                    printf("Invalid borrowDate in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_date(token)) {
-                    printf("Invalid returnDate in line %d\n", line_num); error_count++; continue;
-                }
-
-                token = strtok(NULL, ",");
-                if (!token || !is_valid_overdue(token)) {
-                    printf("Invalid overdue flag in line %d\n", line_num); error_count++; continue;
-                }
+        if (!is_valid_student_id(u->studentId)) {
+            printf("Invalid studentId: %s\n", u->studentId); error_count++;
+        }
+        for (int j = 0; j < student_id_count; j++) {
+            if (strcmp(student_ids[j], u->studentId) == 0) {
+                printf("Duplicate studentId: %s\n", u->studentId); error_count++; break;
             }
         }
-        fclose(f);
+        strncpy(student_ids[student_id_count++], u->studentId, MAX_ID);
+        if (!is_valid_password(u->password)) {
+            printf("Invalid password for %s\n", u->studentId); error_count++;
+        }
+        if (!is_valid_lendavailable(&u->lendAvailable)) {
+            printf("Invalid lendAvailable for %s\n", u->studentId); error_count++;
+        }
+
+        current = current->next;
+    }
+
+    // 2. 도서 파일 검증
+    printf(">>> Verifying Book file...\n");
+    current = book_list->head;
+    while (current) {
+        Book* b = (Book*)current->data;
+
+        if (!is_valid_book_title(b->title)) {
+            printf("Invalid title: %s\n", b->title); error_count++;
+        }
+        if (!is_valid_book_author(b->author)) {
+            printf("Invalid author: %s\n", b->author); error_count++;
+        }
+        if (!is_valid_bid(b->bid)) {
+            printf("Invalid BID: %s\n", b->bid); error_count++;
+        }
+        for (int j = 0; j < bid_count; j++) {
+            if (strcmp(bids[j], b->bid) == 0) {
+                printf("Duplicate BID: %s\n", b->bid); error_count++; break;
+            }
+        }
+        strncpy(bids[bid_count++], b->bid, MAX_BID);
+        if (!is_valid_flag(b->isAvailable ? "Y" : "N")) {
+            printf("Invalid availability flag for BID %s\n", b->bid); error_count++;
+        }
+
+        current = current->next;
+    }
+
+    // 3. 대출/반납 파일 검증
+    printf(">>> Verifying Lend/Return file...\n");
+    current = borrow_list->head;
+    while (current) {
+        Lend_Return* lr = (Lend_Return*)current->data;
+
+        if (!is_valid_student_id(lr->userid)) {
+            printf("Invalid studentId: %s\n", lr->userid); error_count++;
+        }
+        if (!is_valid_bid(lr->bookBid)) {
+            printf("Invalid BID: %s\n", lr->bookBid); error_count++;
+        }
+        if (!is_valid_date(lr->borrowDate)) {
+            printf("Invalid borrowDate: %s\n", lr->borrowDate); error_count++;
+        }
+        if (!is_valid_date(lr->returnDate)) {
+            printf("Invalid returnDate: %s\n", lr->returnDate); error_count++;
+        }
+        if (!is_valid_overdue(lr->isOverdue ? "Y" : "N")) {
+            printf("Invalid overdue flag: %d\n", lr->isOverdue); error_count++;
+        }
+
+        current = current->next;
     }
 
     if (error_count == 0) {
@@ -367,4 +331,5 @@ void run_verify() {
         exit(1);
     }
 }
+
 
