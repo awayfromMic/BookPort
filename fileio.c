@@ -1,8 +1,10 @@
 /*파일 입출력 구현*/
-#include<common.h>
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include "common.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 bool update_file(char* file_name, linked_list* list) {
 	FILE* fp = fopen(file_name, "w+");
@@ -190,7 +192,7 @@ void* find(linked_list* list, void* data, int type) {
 	return NULL;
 }
 
-void remove(linked_list* list, void* data, int type) {
+void remove_node(linked_list* list, void* data, int type) {
 	User* user_data;
 	Book* book_data;
 	Lend_Return* borrow_data;

@@ -6,11 +6,6 @@
 #include "common.h"
 #include "verify.h"
 
-#define MAX_LINE 500
-#define MAX_USERS 1000
-#define MAX_BOOKS 1000
-
-
 // 사용자 정보 관련 함수
 int is_valid_student_name(const char* name) {
     int len = strlen(name);
@@ -75,6 +70,43 @@ int is_valid_password(const char* pw) {
         if (++freq[(unsigned char)pw[i]] >= 5) return 0;
     }
     return has_alpha && has_digit;
+}
+
+int is_correct_password(const char* id, const char* pw) {
+    FILE* file = fopen("users.txt", "r");
+    User user = { 0 };
+    char password[MAX_PW];
+
+    if (!file)
+        return 0;
+
+    char line[MAX_LINE];
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = 0;
+
+        char* token = strtok(line, ",");
+        if (token) strncpy(user.name, token, MAX_NAME);
+
+        token = strtok(NULL, ",");
+        if (token) strncpy(user.studentId, token, MAX_ID);
+
+        if (strcmp(user.studentId, id) == 0) {
+            token = strtok(NULL, ",");
+            if (token) strncpy(user.password, token, MAX_PW);
+
+            if (strcmp(user.password, pw) == 0) {
+                fclose(file);
+                return 1;
+            }
+            else {
+                fclose(file);
+                return 0;
+            }
+        }
+    }
+
+    fclose(file);
+    return 0;
 }
 
 int is_valid_lendavailable(const int* lendAvailable) {
@@ -324,7 +356,6 @@ void run_verify() {
                 }
             }
         }
-
         fclose(f);
     }
 
