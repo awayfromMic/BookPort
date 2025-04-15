@@ -11,10 +11,10 @@ void run_borrow() {
         printf("You must login first to borrow books.\n");
         return;
     }
-    if (current_user.lendAvailable <= 0) {
+    /*if (current_user.lendAvailable <= 0) {
         printf("You cannot borrow more books.\n");
         return;
-    }
+    }*/
     run_search();
     char bid_input[MAX_BID];
     Lend_Return lend;
