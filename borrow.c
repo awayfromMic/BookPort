@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
+#include "verify.h"
 
 #define TEMP_FILE "temp_user.txt"
 
@@ -15,10 +16,12 @@ void run_borrow() {
         printf("You cannot borrow more books.\n");
         return;
     }*/
-    run_search();
+    int search_result = run_search(0);
     char bid_input[MAX_BID];
     Lend_Return lend;
     while (1) {
+        if (search_result == 0) run_search(0);
+
         printf("Enter BID of the book to borrow > ");
         fgets(bid_input, sizeof(bid_input), stdin);
         trim(bid_input);
@@ -42,7 +45,7 @@ void run_borrow() {
             book.title, (unsigned)(sizeof(book.title)),
             book.author, (unsigned)(sizeof(book.author)),
             book.bid, (unsigned)(sizeof(book.bid)),
-            &status_char, 1) == 4) {
+            &status_char, 'Y') == 4) {
             if (!strcmp(book.bid, bid_input)) {
                 found++;
                 strcpy(lend.bookBid, book.bid);

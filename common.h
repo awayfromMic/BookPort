@@ -84,7 +84,7 @@ void run_verify();
 void run_account();
 void run_login();
 void run_logout();
-void run_search();
+int run_search(int mode);
 void run_borrow();
 void run_return();
 void run_myinfo();
