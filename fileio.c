@@ -1,12 +1,5 @@
-/*파일 입출력 구현*/
-#define _CRT_SECURE_NO_WARNINGS
-#include "common.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-bool update_file(char* file_name, linked_list* list) {
+癤�
+bool update_file(const char* file_name, linked_list* list) {
 	FILE* fp = fopen(file_name, "w+");
 	User* user_data;
 	Book* book_data;
@@ -17,8 +10,8 @@ bool update_file(char* file_name, linked_list* list) {
 			user_data = (User*)current->data;
 			fprintf(fp, "%s,%s,%s", user_data->name, user_data->studentId, user_data->password);
 			for (int i = 0; i < 5 - user_data->lendAvailable; i++) {
-				if (i == 0)fprintf(fp, "%s", user_data->lentBids + i);
-				else fprintf(fp, ";%s", user_data->lentBids + i);
+				if (i == 0)fprintf(fp, ",%s", user_data->lentBids[i]);
+				else fprintf(fp, ";%s", user_data->lentBids[i]);
 			}
 			fprintf(fp, ",%d\n", user_data->lendAvailable);
 		}
@@ -92,7 +85,7 @@ linked_list* read_book_data() {
 		token = strtok(NULL, ",");
 		strcpy(data->bid, token);
 		token = strtok(NULL, ",");
-		data->isAvailable = token[0] - '0';
+		data->isAvailable = token[0];
 		insert_back(list, (void*)data);
 	}
 	fclose(fp);
@@ -120,7 +113,7 @@ linked_list* read_borrow_data() {
 		token = strtok(NULL, ",");
 		strcpy(data->returnDate, token);
 		token = strtok(NULL, ",");
-		data->isOverdue = token[0] - '0';
+		data->isOverdue = token[0];
 		insert_back(list, (void*)data);
 	}
 	fclose(fp);
@@ -128,6 +121,7 @@ linked_list* read_borrow_data() {
 }
 
 void insert_back(linked_list* list, void* data) {
+	list->counter++;
 	node* new_node = (node*)calloc(1, sizeof(node));
 	new_node->data = data;
 	if (list->head == NULL) {
@@ -142,6 +136,7 @@ void insert_back(linked_list* list, void* data) {
 }
 
 void insert_front(linked_list* list, void* data, int type) {
+	list->counter++;
 	node* new_node = (node*)calloc(1, sizeof(node));
 	new_node->data = data;
 	if (list->head == NULL) {
@@ -155,39 +150,82 @@ void insert_front(linked_list* list, void* data, int type) {
 	}
 }
 
+bool check_equality(void* data1, void* data2, int type) {
+	switch (type) {
+	case 1:
+		User * user_data1;
+		User* user_data2;
+		user_data1 = (User*)data1;
+		user_data2 = (User*)data2;
+		if (strcmp(user_data1->name, user_data2->name) == 0 && strcmp(user_data1->studentId, user_data2->studentId) == 0 && strcmp(user_data1->password, user_data2->password) == 0) {
+			if (user_data1->lendAvailable != user_data2->lendAvailable) return false;
+			for (int i = 0; i < 5 - user_data1->lendAvailable; i++) {
+				if (strcmp(user_data1->lentBids[i], user_data2->lentBids[i]) != 0) {
+					return false;
+				}
+			}
+		}
+		else {
+			return false;
+		}
+		break;
+	case 2:
+		Book * book_data1;
+		Book* book_data2;
+		book_data1 = (Book*)data1;
+		book_data2 = (Book*)data2;
+		if (strcmp(book_data1->title, book_data2->title) != 0 || strcmp(book_data1->author, book_data2->author) != 0 || strcmp(book_data1->bid, book_data2->bid) != 0 || book_data1->isAvailable != book_data2->isAvailable) {
+			return false;
+		}
+		break;
+	case 3:
+		Lend_Return * borrow_data1;
+		Lend_Return* borrow_data2;
+		borrow_data1 = (Lend_Return*)data1;
+		borrow_data2 = (Lend_Return*)data2;
+		if (strcmp(borrow_data1->userid, borrow_data2->userid) != 0 || strcmp(borrow_data1->bookBid, borrow_data2->bookBid) != 0 || strcmp(borrow_data1->borrowDate, borrow_data2->borrowDate) != 0 || strcmp(borrow_data1->returnDate, borrow_data2->returnDate) != 0 || borrow_data1->isOverdue != borrow_data2->isOverdue) {
+			return false;
+		}
+		break;
+	}
+	return true;
+}
+
 void* find(linked_list* list, void* data, int type) {
 	User* user_data;
 	Book* book_data;
 	Lend_Return* borrow_data;
 	node* current = list->head;
-	switch (type) {
-	case 1:
-		user_data = (User*)data;
-		while (current != NULL) {
-			if ((User*)current->data == user_data) {
-				return current->data;
-			}
-			current = current->next;
+	user_data = (User*)data;
+	while (current != NULL) {
+		if (check_equality(current->data, data, type)) {
+			return current->data;
 		}
-		break;
-	case 2:
-		book_data = (Book*)data;
-		while (current != NULL) {
-			if ((Book*)current->data == book_data) {
-				return current->data;
-			}
-			current = current->next;
+		current = current->next;
+	}
+	return NULL;
+}
+
+Book* find_by_bid(linked_list* list, const char* bid) {
+	Book* book_data;
+	node* current = list->head;
+	while (current != NULL) {
+		if (strcmp(((Book*)current->data)->bid, bid) == 0) {
+			return (Book*)current->data;
 		}
-		break;
-	case 3:
-		borrow_data = (Lend_Return*)data;
-		while (current != NULL) {
-			if ((Lend_Return*)current->data == borrow_data) {
-				return current->data;
-			}
-			current = current->next;
+		current = current->next;
+	}
+	return NULL;
+}
+
+User* find_by_userId(linked_list* list, const char* userId) {
+	User* user_data;
+	node* current = list->head;
+	while (current != NULL) {
+		if (strcmp(((User*)current->data)->studentId, userId) == 0) {
+			return (User*)current->data;
 		}
-		break;
+		current = current->next;
 	}
 	return NULL;
 }
@@ -201,6 +239,7 @@ void remove_node(linked_list* list, void* data, int type) {
 	case 1:
 		user_data = (User*)data;
 		while (current != NULL) {
+			list->counter--;
 			if ((User*)current->data == user_data) {
 				if (current == list->head) {
 					list->head = current->next;
@@ -227,6 +266,7 @@ void remove_node(linked_list* list, void* data, int type) {
 	case 2:
 		book_data = (Book*)data;
 		while (current != NULL) {
+			list->counter--;
 			if ((Book*)current->data == book_data) {
 				if (current == list->head) {
 					list->head = current->next;
@@ -253,6 +293,7 @@ void remove_node(linked_list* list, void* data, int type) {
 	case 3:
 		borrow_data = (Lend_Return*)data;
 		while (current != NULL) {
+			list->counter--;
 			if ((Lend_Return*)current->data == borrow_data) {
 				if (current == list->head) {
 					list->head = current->next;
