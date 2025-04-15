@@ -29,6 +29,14 @@ bool update_file(const char* file_name, linked_list* list) {
 	return true;
 }
 
+bool check_empty(char* token) {
+	if (token == NULL) {
+		printf("integrity check failed");
+		return true;
+	}
+	else return false;
+}
+
 linked_list* read_user_data() {
 	linked_list* list = (linked_list*)calloc(1, sizeof(linked_list));
 	FILE* fp = fopen(USER_FILE, "r");
@@ -43,16 +51,21 @@ linked_list* read_user_data() {
 		User* data = (User*)calloc(1, sizeof(User));
 		line[strcspn(line, "\n")] = 0;
 		char* token = strtok(line, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->name, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->studentId, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->password, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		int idx = 0;
 		char tmp[1 << 10];
 		strcpy(tmp, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		char* bid = strtok(tmp, ";");
 		while (bid != NULL) {
 			strcpy(data->lentBids[idx], bid);
@@ -79,12 +92,16 @@ linked_list* read_book_data() {
 		Book* data = (Book*)calloc(1, sizeof(Book));
 		line[strcspn(line, "\n")] = 0;
 		char* token = strtok(line, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->title, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->author, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->bid, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		data->isAvailable = token[0];
 		insert_back(list, (void*)data);
 	}
@@ -105,14 +122,19 @@ linked_list* read_borrow_data() {
 		Lend_Return* data = (Lend_Return*)calloc(1, sizeof(Lend_Return));
 		line[strcspn(line, "\n")] = 0;
 		char* token = strtok(line, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->userid, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->bookBid, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->borrowDate, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		strcpy(data->returnDate, token);
 		token = strtok(NULL, ",");
+		if (check_empty(token)) return NULL;
 		data->isOverdue = token[0];
 		insert_back(list, (void*)data);
 	}
