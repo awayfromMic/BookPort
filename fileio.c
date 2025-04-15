@@ -218,6 +218,30 @@ Book* find_by_bid(linked_list* list, const char* bid) {
 	return NULL;
 }
 
+Book* find_by_title(linked_list* list, const char* title) {
+	Book* book_data;
+	node* current = list->head;
+	while (current != NULL) {
+		if (strcmp(((Book*)current->data)->title, title) == 0) {
+			return (Book*)current->data;
+		}
+		current = current->next;
+	}
+	return NULL;
+}
+
+Book* find_by_author(linked_list* list, const char* author) {
+	Book* book_data;
+	node* current = list->head;
+	while (current != NULL) {
+		if (strcmp(((Book*)current->data)->author, author) == 0) {
+			return (Book*)current->data;
+		}
+		current = current->next;
+	}
+	return NULL;
+}
+
 User* find_by_userId(linked_list* list, const char* userId) {
 	User* user_data;
 	node* current = list->head;
