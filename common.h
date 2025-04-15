@@ -17,30 +17,41 @@
 #define LEND_RETURN_FILE "lend_return_data.txt" // 대여 정보 파일
 
 // 사용자 구조체
-typedef struct {
-    char name[MAX_NAME];                      // 이름
-    char studentId[MAX_ID];                  // 학번
-    char password[MAX_PW];                   // 비밀번호
-    char lentBids[5][MAX_BID];               // 대여한 책 BID 최대 5권 (';' 없이 배열로 처리)
-    int lendAvailable;                       // 대여 가능 권수
+typedef struct User {
+	char name[MAX_NAME];                      // 이름
+	char studentId[MAX_ID];                  // 학번
+	char password[MAX_PW];                   // 비밀번호
+	char lentBids[5][MAX_BID];               // 대여한 책 BID 최대 5권 (';' 없이 배열로 처리)
+	int lendAvailable;                       // 대여 가능 권수
 } User;
 
 // 도서 구조체
-typedef struct {
-    char title[MAX_TITLE];                   // 제목
-    char author[MAX_AUTHOR];                 // 저자
-    char bid[MAX_BID];                       // 도서 고유 BID
-    int isAvailable;                         // 대여 가능 여부 (0: 가능, 1: 대여 중)
+typedef struct Book {
+	char title[MAX_TITLE];                   // 제목
+	char author[MAX_AUTHOR];                 // 저자
+	char bid[MAX_BID];                       // 도서 고유 BID
+	int isAvailable;                         // 대여 가능 여부 (0: 가능, 1: 대여 중)
 } Book;
 
 // 대출/반납 구조체
-typedef struct {
-    char userid[MAX_ID];                     // 사용자 학번
-    char bookBid[MAX_BID];                   // 도서 BID
-    char borrowDate[MAX_DATE];              // 대출일 (yyyy-mm-dd)
-    char returnDate[MAX_DATE];              // 반납일 (yyyy-mm-dd)
-    int isOverdue;                           // 연체 여부 (0: 정상, 1: 연체)
+typedef struct Lend_Return {
+	char userid[MAX_ID];                     // 사용자 학번
+	char bookBid[MAX_BID];                   // 도서 BID
+	char borrowDate[MAX_DATE];              // 대출일 (yyyy-mm-dd)
+	char returnDate[MAX_DATE];              // 반납일 (yyyy-mm-dd)
+	int isOverdue;                           // 연체 여부 (0: 정상, 1: 연체)
 } Lend_Return;
+
+typedef struct node {
+	struct node* next;
+	struct node* prev;
+	void* data;
+} node;
+
+typedef struct linked_list {
+	struct node* head;
+	struct node* tail;
+} linked_list;
 
 // 로그인 여부와 사용자 ID
 extern int is_logged_in;
@@ -56,6 +67,16 @@ void run_search();
 void run_borrow();
 void run_return();
 void run_myinfo();
+
+bool update_file(char* file_name, linked_list* list);
+linked_list* read_user_data();
+linked_list* read_book_data();
+linked_list* read_borrow_data();
+void insert_back(linked_list* list, void* data);
+void insert_front(linked_list* list, void* data, int type);
+void* find(linked_list* list, void* data, int type);
+void remove(linked_list* list, void* data, int type);
+void print_list(linked_list* list, int type);
 
 // 공통적으로 쓰이는 함수들
 void print_command_usage();                     // 표 출력 함수
