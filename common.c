@@ -8,7 +8,7 @@
 #include "function.h"
 
 // 로그인 여부 판단
-int is_logged_in = 0; // 로그인 시 1
+int is_logged_in = 1; // 로그인 시 1
 User current_user = { 0 };
 
 void run_login() {

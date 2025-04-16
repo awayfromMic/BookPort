@@ -14,7 +14,6 @@ int run_search(int mode) {
     input[strcspn(input, "\n")] = '\0';
     trim(input);
 
-    // 키워드 분리
     char* context = NULL;
     char* token = strtok_s(input, " \t", &context);
     while (token && keyword_count < MAX_KEYWORDS) {
@@ -22,32 +21,27 @@ int run_search(int mode) {
         token = strtok_s(NULL, " \t", &context);
     }
 
-    FILE* file = fopen(BOOK_FILE, "r");
-    if (!file) {
-        printf("도서 정보 파일을 열 수 없습니다.\n");
-        return 0;
+    bool book_integrity = true;
+    linked_list* book_list = read_book_data(&book_integrity);
+    if (!book_integrity) {
+        print_list(book_list, 4);
+        return -1;
     }
 
-    //fileio.c 이용하기 전
-    Book book;
-    char status_char;
+    node* current = book_list->head;
+
     int found = 0;
 
     printf("\n[Search Result]\n");
 
-    while (fscanf_s(file, "%49[^,],%29[^,],%104[^,],%c\n",
-        book.title, (unsigned)sizeof(book.title),
-        book.author, (unsigned)sizeof(book.author),
-        book.bid, (unsigned)sizeof(book.bid),
-        &status_char, 1) == 4) {
-
-        book.isAvailable = (status_char == 'Y') ? 'Y' : 'N';
-
+    int count_y = 0;
+    while (current) {
+        Book* book = (Book*)current->data;
         int match_all = 1;
         for (int i = 0; i < keyword_count; ++i) {
-            if (!(strstr(book.title, keywords[i]) ||
-                strstr(book.author, keywords[i]) ||
-                strcmp(book.bid, keywords[i]) == 0)) {
+            if (!(strstr(book->title, keywords[i]) ||
+                strstr(book->author, keywords[i]) ||
+                strcmp(book->bid, keywords[i]) == 0)) {
                 match_all = 0;
                 break;
             }
@@ -55,27 +49,36 @@ int run_search(int mode) {
 
         if (match_all) {
             if (mode == 1) {
-                printf("> Title: %s\n  Author: %s\n  BID: %s\n\n", book.title, book.author, book.bid);
+                printf("> Title: %s\n  Author: %s\n  BID: %s\n\n", book->title, book->author, book->bid);
+                found = 1;
+                if (book->isAvailable == 'Y') {
+                    count_y++;
+                }
             }
-            else {
-                printf("> Title: %s\n  Author: %s\n  BID: %s\n  Availibility: %s\n\n",
-                    book.title, book.author, book.bid,
-                    book.isAvailable == 'Y' ? "Y" : "N");
+            else if (mode == 0) {
+                printf("> Title: %s\n  Author: %s\n  BID: %s\n  Availibility: %c\n\n", book->title, book->author, book->bid, book->isAvailable);
+                found = 1;
+                if (book->isAvailable == 'Y') {
+                    count_y++;
+                }
             }
-            found = 1;
         }
-    }
 
-    fclose(file);
+        current = current->next;
+    }
 
     if (!found) {
         printf(".!! No search results.\n\n");
         if (mode == 1) {
-            return run_search(1); // 재귀 다시 입력
+            run_search(1);
         }
-        else {
+        else if (mode == 0) {
             return 0;
         }
+    }
+
+    if (count_y == 0) {
+        return 2;
     }
 
     return 1;
