@@ -16,7 +16,7 @@ void run_borrow() {
         printf("You cannot borrow more books.\n");
         return;
     }
-    int search_result = run_search(0);
+
     char bid_input[MAX_BID];
     Lend_Return lend;
     while (1) {
