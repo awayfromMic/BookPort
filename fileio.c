@@ -1,4 +1,10 @@
-﻿
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include "common.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
 bool update_file(const char* file_name, linked_list* list) {
 	FILE* fp = fopen(file_name, "w+");
 	User* user_data;
