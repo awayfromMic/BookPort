@@ -12,15 +12,18 @@ void run_borrow() {
         printf("You must login first to borrow books.\n");
         return;
     }
-    /*if (current_user.lendAvailable <= 0) {
+    if (current_user.lendAvailable <= 0) {
         printf("You cannot borrow more books.\n");
         return;
-    }*/
-    int search_result = run_search(0);
+    }
+
     char bid_input[MAX_BID];
     Lend_Return lend;
     while (1) {
-        if (search_result == 0) run_search(0);
+        int search_result = run_search(0);
+        while (!search_result) {
+            search_result = run_search(0);
+        }
 
         printf("Enter BID of the book to borrow > ");
         fgets(bid_input, sizeof(bid_input), stdin);
