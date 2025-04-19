@@ -5,10 +5,29 @@
 #include "common.h"
 #include "verify.h"
 
-extern void run_logout(); // logout.c에 있는거 가져다 씀
-extern linked_list* read_user_data(); // fileio.c에 있는거 가져다 씀
-extern void update_file(const char* filename, linked_list* list); // fileio.c에 있는거 가져다 씀
-extern void remove_node(linked_list* list, void* target, int free_data); // fileio.c에 있는거 가져다 씀
+#ifndef USER_FILE
+#define USER_FILE "users_data.txt"
+#endif
+
+// External variables
+extern int is_logged_in;
+extern User current_user;
+
+// External functions
+extern void run_login();
+extern void run_logout();
+extern void run_verify();
+extern linked_list* read_user_data(bool* file_integrity);
+extern linked_list* read_book_data();
+extern linked_list* read_borrow_data();
+extern bool update_file(const char* file_name, linked_list* list);
+extern void remove_node(linked_list* list, void* target, int type);
+extern int is_valid_password(const char* pw);
+
+void flush_stdin() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
 
 char* get_myinfo_canonical_command(char* input) {
 	struct {
@@ -132,92 +151,94 @@ void run_manage() {
 	return;
 }
 
-void flush_stdin() { // 입력이 버퍼를 넘겼을때 비워줌
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
-}
-
 void run_change() {
     char new_pw[100];
 
     while (1) {
         printf("BookPort: Enter your new password > ");
-        if (!fgets(new_pw, sizeof(new_pw), stdin)) { // 사용흐름도상에 fgets 실패할경우(EOF 등) 예외처리 표시하는게 좋을거같은데 
-            flush_stdin(); // 여기에 더해 오류메시지 표시까지 해주면 더 좋고
+        if (!fgets(new_pw, sizeof(new_pw), stdin)) {
+            // fgets 실패 (파일 끝이나 에러)
+            flush_stdin();
+            printf(".!! Error: Failed to read input. Try again.\n");
             continue;
         }
-        if (strchr(new_pw, '\n') == NULL) { // 사용자 입력이 너무 길어 버퍼 초과
+
+        // 입력이 너무 길어 '\n'이 안 들어왔다면 flush 필요
+        if (!strchr(new_pw, '\n')) {
             flush_stdin();
             printf(".!! Error: Password must be 5 to 20 characters long.\n");
             continue;
         }
-        new_pw[strcspn(new_pw, "\n")] = '\0';
 
-        int pw_result = is_valid_password(new_pw);
-        if(pw_result!=0){
-            switch (pw_result) {
-                case 1: printf(".!! Error: Password cannot be an empty string.\n"); break;
-                case 2: printf(".!! Error: Password must be 5 to 20 characters long.\n"); break;
-                case 3: printf(".!! Error: Password cannot contain whitespace.\n"); break;
-                case 4: printf(".!! Error: Repeated characters over limit.\n"); break;
-                case 5: printf(".!! Error: Password must be at least 1 character long and include at least 1 digit\n"); break;
-                default: printf(".!! Error: An unknown error occured\n"); break;  // 사용흐름도 상에 이런게 있었나? 어쨌든 문법오류라고 봐서 오류메시지를 출력하도록 하는게 맞나?
+        new_pw[strcspn(new_pw, "\n")] = '\0'; // 개행 문자 제거
+
+        int result = is_valid_password(new_pw);
+        if (result != 0) {
+            // 케이스별 오류 메시지
+            switch (result) {
+            case 1: printf(".!! Error: Password cannot be an empty string.\n"); break;
+            case 2: printf(".!! Error: Password must be 5 to 20 characters long.\n"); break;
+            case 3: printf(".!! Error: Password cannot contain whitespace.\n"); break;
+            case 4: printf(".!! Error: Repeated characters over limit.\n"); break;
+            case 5: printf(".!! Error: Password must include both letters and digits.\n"); break;
+            default: printf(".!! Error: Invalid password format.\n"); break;
             }
             continue;
         }
 
+        // 이전과 같은 비밀번호인지 확인
         if (strcmp(new_pw, current_user.password) == 0) {
             printf(".!! Error: Password is the same as before.\n");
             continue;
         }
 
-        break;
+        break; // 모든 조건 통과
     }
 
-    linked_list* list = read_user_data();
-    node* cur = list->head;
+    bool ok = true;
+    linked_list* list = read_user_data(&ok);
+    if (!ok) {
+        printf(".!! Error: Failed to load user data.\n");
+        return; // 유저데이터 읽어오는거 실패하면 오류메시지 띄워도 되나? 사용흐름도에 이런게 있었나?
+    }
 
-    while (cur) {
+    for (node* cur = list->head; cur; cur = cur->next) {
         User* u = (User*)cur->data;
         if (strcmp(u->studentId, current_user.studentId) == 0) {
             strcpy(u->password, new_pw);
             strcpy(current_user.password, new_pw);
             break;
         }
-        cur = cur->next;
     }
 
-    update_file(USER_FILE, list);
-    printf("\u2026 Your password successfully changed\n");
+    if (!update_file(USER_FILE, list)) {
+        printf(".!! Error: Failed to update user data.\n");
+        return; // 이것도 오류메시지 띄워도 되나?
+    }
+
+    printf("··· Your password successfully changed\n");
 }
 
 void run_withdraw() {
-    printf("BookPort: Do you want to withdraw?(.../No) > ");
-    char input[5];
-    int flushed = 0;
-
+    printf("BookPort: Do you want to withdraw?(.../No) >");
+    char input[10];
     if (!fgets(input, sizeof(input), stdin)) {
-        flushed = 1;
-    } else {
+        flush_stdin();
+    }
+    else {
         input[strcspn(input, "\n")] = '\0';
-        if (strcmp(input, "No") == 0) {
-            return;
-        }
-        if (strchr(input, '\n') == NULL) flushed = 1;
+        if (strcmp(input, "No") == 0) return;
+        if (!strchr(input, '\n')) flush_stdin();
     }
 
-    if (flushed) flush_stdin();
-
-    linked_list* list = read_user_data();
-    node* cur = list->head;
-
-    while (cur) {
+    bool ok = true;
+    linked_list* list = read_user_data(&ok);
+    for (node* cur = list->head; cur; cur = cur->next) {
         User* u = (User*)cur->data;
         if (strcmp(u->studentId, current_user.studentId) == 0) {
             remove_node(list, u, 1);
             break;
         }
-        cur = cur->next;
     }
 
     update_file(USER_FILE, list);
