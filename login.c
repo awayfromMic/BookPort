@@ -8,7 +8,7 @@
 
 
 User get_user_by_id(const char* id) {
-    FILE* file = fopen("users.txt", "r");
+    FILE* file = fopen("users_data.txt", "r");
     User user = { 0 };
 
     if (!file)

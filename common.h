@@ -10,7 +10,6 @@
 #define MAX_TITLE 50
 #define MAX_AUTHOR 50
 #define MAX_BID 50
-
 #define MAX_DATE 11
 
 // ���� ���
@@ -32,7 +31,7 @@ typedef struct {
     char title[MAX_TITLE];                   // ����
     char author[MAX_AUTHOR];                 // ����
     char bid[MAX_BID];                       // ���� ���� BID
-    char isAvailable;                         // �뿩 ���� ���� ("Y": ���� ����, "N": ���� �Ұ���)
+    char isAvailable;                         // �in뿩 ���� ���� ("Y": ���� ����, "N": ���� �Ұ���)
 } Book;
 
 typedef struct node {
@@ -93,5 +92,11 @@ void run_myinfo();
 void print_command_usage();                     // ǥ ��� �Լ�
 char* get_canonical_command(const char* input); // ���Ǿ� �� ��ǥ���ɾ�
 void trim(char* str);
+
+// login.c
+User login_user(); // 로그인 함수
+
+// account.c
+User register_user(); // 회원가입 함수
 
 #endif

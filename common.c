@@ -5,10 +5,9 @@
 
 #include "common.h"
 #include "verify.h"
-#include "function.h"
 
-// 로그인 여부 판단
-int is_logged_in = 1; // 로그인 시 1
+// �α��� ���� �Ǵ�
+int is_logged_in = 0; // �α��� �� 1
 User current_user = { 0 };
 
 void run_login() {
@@ -30,11 +29,12 @@ void run_login() {
 void run_account() {
     if (is_logged_in == 1)
         printf(".!! You are already logged in.\n");
-    
+
     else {
-		User user = register_user();
+        User user = register_user();
         if (user.studentId[0] != '\0') {
             FILE* file = fopen("users_data.txt", "a");
+
             if (file == NULL)
                 printf(".!! Error: Failed to open file.\n");
             else {
@@ -51,21 +51,20 @@ void run_account() {
                     lentBidsInfo,
                     user.lendAvailable
                 );
+
+                fclose(file);
             }
 
-            fclose(file);
         }
     }
 }
 
 void run_logout() {
-	if (is_logged_in == 0)
-		printf("....Cannot logout because you are not logged in\n");
-
-	else {
-		is_logged_in = 0;
-		current_user = (User){ 0 };
-		printf("...Logout completed\n");
-	}
+    if (is_logged_in == 0)
+        printf("....Cannot logout because you are not logged in\n");
+    else {
+        is_logged_in = 0;
+        current_user = (User){ 0 };
+        printf("...Logout completed\n");
+    }
 }
-
