@@ -59,7 +59,8 @@ int compare_record_entry(const void* a, const void* b) {
 void run_record() {
 	int user_record_count = 0;
 	linked_list* lend_returndata;
-	lend_returndata = read_borrow_data();
+	bool lend_return_ok = true;
+	lend_returndata = read_borrow_data(&lend_return_ok);
 	int lend_return_count = 0;
 	for (node* count = lend_returndata->head; count != NULL; count = count->next) lend_return_count++;
 	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
@@ -80,7 +81,9 @@ void run_record() {
 			}
 		}
 	}
-	qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
+	if (user_record_count >0) {
+		qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
+	}
 	if (user_record_count > 0) printf("=> ");
 	for (int i = 0; i < user_record_count; i++) {
 		char* d = user_record[i].date;
@@ -95,7 +98,8 @@ void run_record() {
 void run_manage() {
 	char input[100];
 	linked_list* bookdata;
-	bookdata = read_book_data();
+	bool book_ok = true;
+	bookdata = read_book_data(&book_ok);
 
 	while (1) {
 		printf("BookPort: Manage - Enter command >");
