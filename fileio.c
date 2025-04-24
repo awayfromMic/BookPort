@@ -1,10 +1,10 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include "common.h"
-
 
 bool update_file(const char* file_name, linked_list* list) {
 	FILE* fp = fopen(file_name, "w+");
@@ -84,7 +84,7 @@ linked_list* read_user_data(bool* file_integrity) {
 		strcpy(tmp, token);
 
 		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		if (check_empty(token, file_integrity)) { /*add_violation_line(violation_lines, line_copy); */ *file_integrity = true;  continue; }
 		char* bid = strtok(tmp, ";");
 
 		while (bid != NULL) {
@@ -174,7 +174,7 @@ linked_list* read_borrow_data(bool* file_integrity) {
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		strcpy(data->returnDate, token);
 		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		if (check_empty(token, file_integrity)) { /*add_violation_line(violation_lines, line_copy);*/ *file_integrity = true; continue; }
 		data->isOverdue = token[0];
 		insert_back(list, (void*)data);
 	}

@@ -270,7 +270,7 @@ void run_verify() {
     bool user_integrity = true;
     linked_list* user_list = read_user_data(&user_integrity);
 
-    printf(">>> Verifying User file...\n");
+    printf("\n>>> Verifying User file...\n");
 
     if (!user_integrity) {
         printf(" - File integrity failed. Invalid lines:\n");
@@ -332,7 +332,7 @@ void run_verify() {
     bool book_integrity = true;
     linked_list* book_list = read_book_data(&book_integrity);
 
-    printf(">>> Verifying Book file...\n");
+    printf("\n>>> Verifying Book file...\n");
 
     if (!book_integrity) {
         printf(" - File integrity failed. Invalid lines:\n");
@@ -387,7 +387,7 @@ void run_verify() {
     bool borrow_integrity = true;
     linked_list* borrow_list = read_borrow_data(&borrow_integrity);
 
-    printf(">>> Verifying Lend/Return file...\n");
+    printf("\n>>> Verifying Lend/Return file...\n");
 
     if (!borrow_integrity) {
         printf(" - File integrity failed. Invalid lines:\n");

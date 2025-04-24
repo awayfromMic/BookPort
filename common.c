@@ -6,8 +6,7 @@
 #include "common.h"
 #include "verify.h"
 
-// �α��� ���� �Ǵ�
-int is_logged_in = 0; // �α��� �� 1
+int is_logged_in = 0;
 User current_user = { 0 };
 
 void run_login() {
@@ -39,9 +38,19 @@ void run_account() {
                 printf(".!! Error: Failed to open file.\n");
             else {
                 char lentBidsInfo[MAX_BID] = "";
+                
+                int hasValue = 0;
+
                 for (int i = 0; i < 5; i++) {
-                    strcat(lentBidsInfo, user.lentBids[i]);
-                    if (i < 4) strcat(lentBidsInfo, ";");
+                    if (strlen(user.lentBids[i]) > 0) {
+                        if (hasValue) strcat(lentBidsInfo, ";");
+                        strcat(lentBidsInfo, user.lentBids[i]);
+                        hasValue = 1;
+                    }
+                }
+
+                if (strlen(lentBidsInfo) == 0) {
+                    strcpy(lentBidsInfo, "");
                 }
 
                 fprintf(file, "%s,%s,%s,%s,%d\n",
