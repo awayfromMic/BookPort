@@ -56,6 +56,14 @@ int compare_record_entry(const void* a, const void* b) {
 	return strcmp(((RecordEntry*)a)->date, ((RecordEntry*)b)->date);
 }
 
+bool return_valid_date(const char* s) {
+	if (strlen(s) != 8) return false;
+	for (int i = 0; i < 8; i++) {
+		if (!isdigit(s[i])) return false;
+	}
+	return true;
+}
+
 void run_record() {
 	int user_record_count = 0;
 	linked_list* lend_returndata;
@@ -64,7 +72,7 @@ void run_record() {
 	int lend_return_count = 0;
 	for (node* count = lend_returndata->head; count != NULL; count = count->next) lend_return_count++;
 	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
-
+	printf("l_r count%d\n", lend_return_count);
 
 	for (node* j = lend_returndata->head; j != NULL; j = j->next) {
 		Lend_Return* l = (Lend_Return*)j->data;
@@ -73,7 +81,7 @@ void run_record() {
 			strcpy(user_record[user_record_count].type, "borrow");
 			strcpy(user_record[user_record_count].bid, l->bookBid);
 			user_record_count++;
-			if (l->returnDate[0] != '\0') {
+			if (return_valid_date(l->returnDate)) {
 				strcpy(user_record[user_record_count].date, l->returnDate);
 				strcpy(user_record[user_record_count].type, "return");
 				strcpy(user_record[user_record_count].bid, l->bookBid);
@@ -81,7 +89,7 @@ void run_record() {
 			}
 		}
 	}
-	if (user_record_count >0) {
+	if (user_record_count > 0) {
 		qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
 	}
 	if (user_record_count > 0) printf("=> ");
@@ -118,6 +126,7 @@ void run_manage() {
 
 				for (node* j = bookdata->head; j != NULL; j = j->next) {
 					Book* b = (Book*)j->data;
+					//printf("b bid %s, current_user.lentBids %s\n", b->bid, current_user.lentBids[i]);
 					if (strcmp(b->bid, current_user.lentBids[i]) == 0) {
 						printf("Title: %s\n", b->title);
 						printf("Author: %s\n", b->author);
