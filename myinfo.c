@@ -72,7 +72,7 @@ void run_record() {
 	int lend_return_count = 0;
 	for (node* count = lend_returndata->head; count != NULL; count = count->next) lend_return_count++;
 	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
-	printf("l_r count%d\n", lend_return_count);
+	//printf("l_r count%d\n", lend_return_count);
 
 	for (node* j = lend_returndata->head; j != NULL; j = j->next) {
 		Lend_Return* l = (Lend_Return*)j->data;
